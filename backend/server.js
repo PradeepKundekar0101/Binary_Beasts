@@ -7,6 +7,7 @@ const multer = require("multer");
 
 
 const userRoute = require("./routes/userRoute");
+const itemRoute = require("./routes/itemRoute");
 const Application = require("./models/application");
 // const postRoute = require("./routes/post.js");
 // const authUser= require("./middleware/auth.js");
@@ -45,19 +46,7 @@ const storage = multer.diskStorage({
 
 // app.post("/post/add",authUser,upload.single("image"),addPost);
 app.use("/user",userRoute);
-app.post("/application",async(req,res)=>{
-    try {
-      const newApplication = new Application({user:req.body});
-      const savedApplication = await newApplication.save();
-      
-        res.status(200).send({success:true,message:"Application Sent successfully"});
-    
-  
-    } catch (error) {
-      res.status(400).send({success:false,message:"Application Failed"});
-    }
-    
-})
+app.use("/items",itemRoute);
 // app.use("/post",postRoute);
 //Listen the app
 const PORT = process.env.PORT;

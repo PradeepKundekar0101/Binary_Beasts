@@ -15,8 +15,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 // Create a new item
-router.post('/items', upload.single('image'), async (req, res) => {
+router.post('/add', upload.single('image'), async (req, res) => {
   try {
+    
     const { name, description, quantity, location, category } = req.body;
     const imagePath = req.file.path; // Get the path to the uploaded image
 
@@ -30,59 +31,65 @@ router.post('/items', upload.single('image'), async (req, res) => {
     });
 
     const savedItem = await newItem.save();
-    res.json(savedItem);
+    console.log("first")
+    res.status(200).send({success:true,data:savedItem});
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // Retrieve all items
-router.get('/items', async (req, res) => {
+router.get('/getAll', async (req, res) => {
     try {
+     
       const items = await Item.find();
-      res.json(items);
+      
+      res.send({data:items});
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
 
 // Retrieve an item by ID
-router.get('/items/:itemId', async (req, res) => {
+router.get('/:itemId', async (req, res) => {
     const { itemId } = req.params;
     try {
       const item = await Item.findById(itemId);
       if (!item) {
         return res.status(404).json({ error: 'Item not found' });
       }
-      res.json(item);
+      res.send({data:item});
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
 
 // Update an item by ID
-router.put('/items/:itemId', async (req, res) => {
+router.put('/update/:itemId', upload.single('image'),async (req, res) => {
     const { itemId } = req.params;
     try {
+      console.log(req.body)
       const updatedItem = await Item.findByIdAndUpdate(itemId, req.body, { new: true });
       if (!updatedItem) {
         return res.status(404).json({ error: 'Item not found' });
       }
-      res.json(updatedItem);
+      res.send({success:true,data:updatedItem});
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
 
 // Delete an item by ID
-router.delete('/items/:itemId', async (req, res) => {
+router.delete('/delete/:itemId', async (req, res) => {
     const { itemId } = req.params;
+    
     try {
       const deletedItem = await Item.findByIdAndRemove(itemId);
       if (!deletedItem) {
         return res.status(404).json({ error: 'Item not found' });
       }
-      res.json(deletedItem);
+      res.status(200).send({success:true,data:deletedItem});
+      
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
     }
