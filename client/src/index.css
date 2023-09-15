@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.login-container .left{
+    background-image: url("./assets/login.jpg");
+}
+.register-container .left
+{
+    background-image: url("./assets/register.jpg");
+}
