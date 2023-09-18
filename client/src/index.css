@@ -3,9 +3,20 @@
 @tailwind utilities;
 
 .login-container .left{
-    background-image: url("./assets/login.jpg");
+    background-image: url("https://img.freepik.com/premium-vector/inventory-control-system-concept-professional-manager-checking-goods-stock-supply-inventory-management-with-goods-demand_185038-803.jpg");
 }
 .register-container .left
 {
-    background-image: url("./assets/register.jpg");
+    background-image: url("https://img.freepik.com/free-vector/store-staff-check-number-products-that-must-be-delivered-customers-during-day_1150-51079.jpg?w=2000");
+}
+.hero{
+    background-image: linear-gradient(0deg,#0009,#0009),  url("https://images.pexels.com/photos/2701434/pexels-photo-2701434.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
+}
+.heading
+{
+    background-color: #4158D0;
+background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+
 }

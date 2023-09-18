@@ -27,8 +27,11 @@ const itemSchema = new Schema({
   category: {
     type: String,
     required: true
+  }},
+  {
+    timestamps:true
   }
-});
+);
 
 
 const Item = mongoose.model('Item', itemSchema);

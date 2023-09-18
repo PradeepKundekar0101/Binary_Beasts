@@ -4,13 +4,11 @@ import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import {format} from 'timeago.js'
-const Users = () => {
-  const [verifiedUsers, setVerifiedUsers] = useState([]);
-  const [userApplications, setUserApplications] = useState([]);
-
+const ManageOrders = () => {
+  const [orders, setOrders] = useState([]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isCancelConfirmModalOpen, setIsCancelConfirmModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [cnt,setCnt] = useState(0);
   const openConfirmModel = () => {
     setIsConfirmModalOpen(true);
@@ -27,40 +25,31 @@ const Users = () => {
   const closeCancelConfirmModel = ()=>{
     setIsCancelConfirmModalOpen(false);
   }
-
-  const fetchAllUsers = async () => {
+  const fetchAllOrders = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8080/user/getAllUsers");
-      const verifiedObjects = data.data.filter(obj => obj.verified === true);
-      setVerifiedUsers(verifiedObjects);
-    } catch (error) {
-     console.log(error.message)
-    }
-  };
-
-  const fetchUserApplications = async () => {
-    try {
-      const { data } = await axios.get("http://localhost:8080/userapplication/allApplications");
-      setUserApplications(data.data);
+      const { data } = await axios.get("http://localhost:8080/orders/getAllOrders");
+      setOrders(data);
+      orders.forEach((e)=>{e.confirmed? setCnt(cnt+1):setCnt(cnt)});
     } catch (error) {
      console.log(error.message)
     }
   };
 
   useEffect(() => {
-    fetchAllUsers();
-    fetchUserApplications();
+    fetchAllOrders();
   }, []);
 
-  const verifyUser = async () => {
-    try {   
-      const { data } = await axios.put(`http://localhost:8080/user/verify/${selectedUser.user_id}`,selectedUser);
+  const confirmOrder = async () => {
+    try {
+      const { data } = await axios.put(`http://localhost:8080/orders/${selectedOrder._id}`);
+    
       if (data.success)
       {
-        const tempUserapplications = userApplications.filter((e)=>{return e._id!=selectedUser._id});
-        setUserApplications(tempUserapplications);
-        const res = await axios.delete(`http://localhost:8080/userapplication/${selectedUser._id}`);
-        console.log(res);
+        
+        const tempOrder = orders.filter((e)=>{return e._id!=selectedOrder._id});
+        setOrders(tempOrder);
+        const decRes = await axios.put(`http://localhost:8080/items//decrease-quantity/${selectedOrder.item_id}`,{ quantity:selectedOrder.quantity});
+        
         closeConfirmModel();
       }
     } catch (error) {
@@ -70,12 +59,12 @@ const Users = () => {
 
   const deleteOrder = async()=>{
     try {
-      const { data } = await axios.delete(`http://localhost:8080/userapplication/${selectedUser._id}`);
+      const { data } = await axios.delete(`http://localhost:8080/orders/${selectedOrder._id}`);
       if (data.success)
       {
         closeCancelConfirmModel();
-        const tempOrder = orders.filter((e)=>{return e._id!=selectedUser._id});
-        setUserApplications(tempOrder);
+        const tempOrder = orders.filter((e)=>{return e._id!=selectedOrder._id});
+        setOrders(tempOrder);
       }
     } catch (error) {
       console.log(error.message);
@@ -90,8 +79,8 @@ const Users = () => {
             id="popup-modal"
             className="fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
           >
-            <div className="relative w-full max-w-md max-h-full">
-              <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <div className="relative mx-auto w-full max-w-md max-h-full">
+              <div className="relative   bg-white rounded-lg shadow dark:bg-gray-700">
                 <button
                   onClick={closeCancelConfirmModel}
                   type="button"
@@ -132,7 +121,7 @@ const Users = () => {
                     />
                   </svg>
                   <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    Are you sure you want to delete this Application?
+                    Are you sure you want to delete this order?
                   </h3>
                   <button
                     onClick={()=>{
@@ -171,7 +160,7 @@ const Users = () => {
               {/* Modal header */}
               <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Confirm Verification
+                  Confirm Order
                 </h3>
                 <button
                   onClick={closeConfirmModel}
@@ -200,18 +189,18 @@ const Users = () => {
               {/* Modal body */}
               <div className="p-6 space-y-6">
                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    The User will be Verified
+                    The order will be confirmed and the Quantity will be deducted
                 </p>
                 
               </div>
               {/* Modal footer */}
               <div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                 <button
-                  onClick={()=>{verifyUser()}}
+                  onClick={()=>{confirmOrder()}}
                   type="button"
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
-                  Confirm Verification
+                  Confirm Order
                 </button>
                 <button
                   onClick={closeConfirmModel}
@@ -231,67 +220,50 @@ const Users = () => {
 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table className="w-[95vw] mx-auto rounded-md my-5  text-sm text-left text-gray-500 dark:text-gray-400">
         <caption className="p-5  text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-            User to Verify
+            Orders to Confirm
            
         </caption>
         <thead className="text-xs text-gray-700 uppercase round bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-            <th scope="col" className=" text-center text-lg px-6 py-3">
-                    Profile
-                </th>
-
                 <th scope="col" className=" text-center text-lg px-6 py-3">
-                    First Name
+                    User
                 </th>
                 <th scope="col" className="text-center text-lg px-6 py-3">
-                Last Name
+                    Item
                 </th>
                 <th scope="col" className="text-center text-lg px-6 py-3">
-                    email
+                    Quantity
                 </th>
                 <th scope="col" className="text-center text-lg px-6 py-3">
-                    Phone Number
-                </th>
-                <th scope="col" className="text-center text-lg px-6 py-3">
-                    Role
-                </th>
-                <th scope="col" className="text-center text-lg px-6 py-3">
-                  Actions
+                    Actions
                 </th>
                
                 
             </tr>
-            {/* {cnt===appl.length?<h1 className=''>No Order</h1>:<></>} */}
-            {userApplications.map((element,i)=>{
+            {cnt===orders.length?<h1 className=''>No Order</h1>:<></>}
+            {orders.map((element,i)=>{
             
-                return   <tr className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
-                
-                <td className="text-center text-lg px-6 py-4">
-                 
-                 <img className='h-10 w-10 rounded-full' src={`${element.profilePicture}`} alt="" /> 
-                </td>
+                return   !element.confirmed &&  <tr className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
                 <th scope="row" className="text-center lowercase text-lg px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                   {element.firstname}
-                
+                   {element.user_email}
+                   <span className='text-sm font-light bg-slate-600 text-white px-2 rounded-full mx-2'>
+                    {
+                      format(element.createdAt)
+                    }
+                    </span>
                 </th>
-                <td className="text-center lowercase text-lg px-6 py-4">
-                {element.lastname}
-                </td>
-                <td className="text-center lowercase text-lg px-6 py-4">
-                {element.email}
+                <td className="text-center text-lg px-6 py-4">
+                {element.item_name}
                 </td>
                 <td className="text-center text-lg px-6 py-4">
-                {element.phonenumber}
-                </td>
-                <td className="text-center text-lg px-6 py-4">
-                {element.role}
+                {element.quantity}
                 </td>
                 <td className="px-6 py-4 flex items-center justify-center space-x-2 text-right">
-                <button onClick={()=>{openConfirmModel();setSelectedUser(element)}} className='text-green-100 text-xl bg-green-900 rounded-md px-2 py-1'>
-                  Verify
+                <button onClick={()=>{openConfirmModel();setSelectedOrder(element)}} className='text-green-100 text-xl bg-green-900 rounded-md px-2 py-1'>
+                  Confirm
             </button>
 
-            <button onClick={()=>{setSelectedUser(element);openCancelConfirmModel();}} className='text-red-100 text-xl bg-red-900 rounded-md px-2 py-1'>
+            <button onClick={()=>{setSelectedOrder(element);openCancelConfirmModel();}} className='text-red-100 text-xl bg-red-900 rounded-md px-2 py-1'>
                   Cancel
             </button>
 
@@ -310,84 +282,10 @@ const Users = () => {
 </div>
 
 
-<div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <table className="w-[95vw] mx-auto rounded-md my-5  text-sm text-left text-gray-500 dark:text-gray-400">
-        <caption className="p-5  text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-            Verified Users
-           
-        </caption>
-        <thead className="text-xs text-gray-700 uppercase round bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-            <th scope="col" className=" text-center text-lg px-6 py-3">
-                    Profile
-                </th>
-
-                <th scope="col" className=" text-center text-lg px-6 py-3">
-                    First Name
-                </th>
-                <th scope="col" className="text-center text-lg px-6 py-3">
-                Last Name
-                </th>
-                <th scope="col" className="text-center text-lg px-6 py-3">
-                    email
-                </th>
-                <th scope="col" className="text-center text-lg px-6 py-3">
-                    Phone Number
-                </th>
-                <th scope="col" className="text-center text-lg px-6 py-3">
-                    Role
-                </th>
-               
-               
-                
-            </tr>
-            {/* {cnt===appl.length?<h1 className=''>No Order</h1>:<></>} */}
-            {verifiedUsers.map((element,i)=>{
-            
-                return   <tr className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
-                
-                <td className="text-center text-lg px-6 py-4">
-                 
-                 <img className='h-10 w-10 rounded-full' src={`${element.profilePicture}`} alt="" /> 
-                </td>
-                <th scope="row" className="text-center lowercase text-lg px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                   {element.firstname}
-                
-                </th>
-                <td className="text-center lowercase text-lg px-6 py-4">
-                {element.lastname}
-                </td>
-                <td className="text-center lowercase text-lg px-6 py-4">
-                {element.email}
-                </td>
-                <td className="text-center text-lg px-6 py-4">
-                {element.phonenumber}
-                </td>
-                <td className="text-center text-lg px-6 py-4">
-                {element.role}
-                </td>
-               
-            </tr>
-            })}
-
-           
-        </thead>
-        <tbody>
-           
-            
-           
-        </tbody>
-    </table>
-</div>
-
-
-
-
-
 
 
     </div>
   )
 }
 
-export default Users
+export default ManageOrders

@@ -18,6 +18,11 @@ const AddProduct = () => {
   const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
 
+  const [selectedOption, setSelectedOption] = useState('teacher');
+  const handleSelectChange = (event) => {
+    setSelectedOption(event.target.value);
+  };
+
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
@@ -34,9 +39,7 @@ const AddProduct = () => {
     setLocation(e.target.value);
   };
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-  };
+  
 
   const handleImageChange = (e) => {
     const selectedImage = e.target.files[0];
@@ -50,7 +53,7 @@ const AddProduct = () => {
     formData.append('description', description);
     formData.append('quantity', quantity);
     formData.append('location', location);
-    formData.append('category', category);
+    formData.append('category', selectedOption);
     formData.append('image', image);
     formData.append('userId', userStored._id);
 
@@ -68,7 +71,6 @@ const AddProduct = () => {
       }
     } catch (error) {
       console.error(error.message);
-      // Handle errors, show error message, etc.
     }
   };
 
@@ -77,11 +79,6 @@ const AddProduct = () => {
       <Navbar />
       <h1 className='text-center text-2xl font-bold'>Add an Item</h1>
       <form onSubmit={handleSubmit} className='w-[80vw] mx-auto'>
-        {/* Input fields for Item details */}
-        {/* Similar to your PostForm, add fields for name, description, quantity, location, category, and image */}
-        {/* Use handleNameChange, handleDescriptionChange, etc., to update state */}
-        
-       
         <div className="mb-6">
           <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
             Item Name
@@ -159,21 +156,16 @@ const AddProduct = () => {
             />
             </div>
 
-            <div className="mb-6">
-            <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Item Category
-            </label>
-            <input
-                type="text"
-                min={3}
-                id="category"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                placeholder="Enter item category"
-                value={category}
-                onChange={handleCategoryChange}
-                required
-            />
-            </div>
+            <div className="mb-4">
+          <label htmlFor="role" className="block font-medium text-gray-600">
+            Category
+          </label>
+          <select value={selectedOption} className="w-full p-2 border rounded-md" onChange={handleSelectChange}>
+                <option value="hardware">Hardware</option>
+                <option value="software">Software</option>
+                <option value="consumables">Consumables</option>
+            </select>
+        </div>
 
 
         <button
