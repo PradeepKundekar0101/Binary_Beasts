@@ -1,10 +1,11 @@
+
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
-const Users = () => {
-  const [items, setItems] = useState([]);
+const ManageProducts = () => {
+    const [items, setItems] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItemtoDelete, setSelectedItemtoDelete] = useState(null);
   const [currentFilter, setCurrentFilter] = useState('All'); // Initial filter is set to 'All'
@@ -22,7 +23,7 @@ const Users = () => {
       const { data } = await axios.get("http://localhost:8080/items/getAll");
       setItems(data.data);
     } catch (error) {
-        console.log(error.message);
+      // Handle the error
     }
   };
 
@@ -56,12 +57,12 @@ const Users = () => {
   return (
     <div>
         <Navbar/>
-    {isDeleteModalOpen && (
+{isDeleteModalOpen && (
             <div
             id="popup-modal"
             className="fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
           >
-            <div className="relative w-full max-w-md max-h-full">
+            <div className="relative mx-auto w-full max-w-md max-h-full">
               <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                 <button
                   onClick={closeDeleteModal}
@@ -125,7 +126,7 @@ const Users = () => {
               </div>
             </div>
           </div>
-       
+        // Delete modal content (same as before)
       )}
 
 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -188,4 +189,4 @@ const Users = () => {
   )
 }
 
-export default Users
+export default ManageProducts

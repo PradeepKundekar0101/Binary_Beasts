@@ -6,8 +6,21 @@ import {auth,provider} from "../firebase";
 import {signInWithPopup} from "firebase/auth";
 import axios from 'axios'
 import {setUser,setToken} from '../store/slices/auth'
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
+  
+  //  const notify = () => toast('Registered', {
+  //   position: "top-right",
+  //   autoClose: 5000,
+  //   hideProgressBar: false,
+  //   closeOnClick: true,
+  //   pauseOnHover: true,
+  //   draggable: true,
+  //   progress: undefined,
+  //   theme: "light",
+  //   });
     const nagivate = useNavigate();
     const dispatch = useDispatch();
     const [form,setForm] = useState({username:"",email:"",password:""});
@@ -27,7 +40,7 @@ const Register = () => {
         {
             dispatch(setUser(data.data));
             dispatch(setToken(data.token));
-            alert("Register sucessfull");
+            notify();
         }
       } catch (error) {
          alert(error.response.data.message)
@@ -36,6 +49,20 @@ const Register = () => {
    }
 
     const handleOnSubmit=async(e)=>{
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        />
+        {/* Same as */}
+        <ToastContainer />
       // e.preventDefault();
       const {username,email,password} = form;
       try {

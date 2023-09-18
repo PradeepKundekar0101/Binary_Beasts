@@ -8,10 +8,10 @@ const multer = require("multer");
 
 const userRoute = require("./routes/userRoute");
 const itemRoute = require("./routes/itemRoute");
-const Application = require("./models/application");
-// const postRoute = require("./routes/post.js");
-// const authUser= require("./middleware/auth.js");
-// const {addPost} = require("./controllers/postController.js");
+const orderRoute = require("./routes/orderRoutes");
+const applicationRoute = require("./routes/userapplication")
+
+
 
 const app = express();
 app.use(express.json());
@@ -47,6 +47,9 @@ const storage = multer.diskStorage({
 // app.post("/post/add",authUser,upload.single("image"),addPost);
 app.use("/user",userRoute);
 app.use("/items",itemRoute);
+app.use("/orders",orderRoute);
+
+app.use("/userapplication",applicationRoute);
 // app.use("/post",postRoute);
 //Listen the app
 const PORT = process.env.PORT;

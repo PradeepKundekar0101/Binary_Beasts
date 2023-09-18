@@ -14,6 +14,31 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+router.get("/cat",async(req,res)=>{
+  try {
+    console.log("first")
+    let h=0;
+    let s=0;
+    let c=0;
+    const all = await Item.find();
+    all.forEach((e)=>{
+      if(e.category==='hardware') h++;
+      else  if(e.category==='software') s++;
+      else c++;
+    })
+    let ans = [];
+    ans.push(h);
+    ans.push(s);
+    ans.push(c);
+
+    res.send({ data:ans });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
 // Create a new item
 router.post('/add', upload.single('image'), async (req, res) => {
   try {
@@ -94,5 +119,63 @@ router.delete('/delete/:itemId', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
-        
+
+  //Count Cat
+router.get('/categories', async (req, res) => {
+  
+});
+      
+router.get('/:itemId', async (req, res) => {
+  const { itemId } = req.params;
+  try {
+    const item = await Item.findById(itemId);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    res.send({data:item});
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+router.put('/decrease-quantity/:itemId', async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { quantity } = req.body;
+    const item = await Item.findById(itemId);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      return res.status(400).json({ error: 'Invalid quantity value' });
+    }
+    item.quantity -= quantity;
+    await item.save();
+    if(item.quantity<=5)
+    {
+      const accountSid = process.env.ACCOUNTSID;
+      const authToken = process.env.AUTHTOKEN;
+      const client = require('twilio')(accountSid, authToken);
+
+      client.messages
+          .create({
+              body: item.name+" Is About to get Sold Out",
+              from: 'whatsapp:+14155238886',
+              to: 'whatsapp:+917411420401'
+          })
+          .then(message => console.log(message.sid))
+          .done();
+    }
+    res.json({ success:true,message: 'Quantity updated successfully', updatedItem: item });
+  } catch (error) {
+    console.error('Error updating quantity:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 module.exports = router;
+

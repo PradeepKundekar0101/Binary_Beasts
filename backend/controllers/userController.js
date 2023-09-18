@@ -10,7 +10,7 @@ const signupController = async (req, res) => {
           if (userFound) {
             return res.status(400).json({ message: "User already exist" });
           }
-          const newUser = await User.create({username,email,profilePicture: profile});
+          const newUser = await User.create({username,email,profilePicture: profile,role:""});
           const token = jwt.sign({ email, id: newUser._id },process.env.JWT_SECRET);
           res.status(200).json({ data: newUser,success:true,token});
         } catch (error) {

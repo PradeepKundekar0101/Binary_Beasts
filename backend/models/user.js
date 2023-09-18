@@ -14,11 +14,11 @@ const userSchema = new Schema({
     type: String,
     required: false,
   },
-  first_name: {
+  firstname: {
     default:"",
     type: String,
   },
-  last_name: {
+  lastname: {
     default:"",
     type: String,
    
@@ -26,16 +26,22 @@ const userSchema = new Schema({
   role: {
     default:"",
     type: String,
-    enum: ['admin', 'teacher', 'staff'], 
+   
   
+  },
+  phonenumber:{
+    default:"",
+    type:Number
   },
   verified:{
     type:Boolean,
     default:false
-  }
-});
+  },
+}, {
+    timestamps: true, 
+  });
 
-// Create the User model
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
